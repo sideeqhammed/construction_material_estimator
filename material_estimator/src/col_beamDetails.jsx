@@ -1,45 +1,143 @@
-import { useState } from "react"
+import { useState, useMemo } from "react";
+import DimensionsInput from "./dimensionsInput";
+import BarSizeInput from "./barSizeInput";
+import MaterialsInput from "./materialsInput";
 
-function Col_BeamDetails(){
-  const [length, setLength] = useState(0)
-  const [breadth, setBreadth] = useState(0)
-  const [depth, setDepth] = useState(0)
-  const [mainBar, setMainBar] = useState(0)
-  const [numberMain, setNumberMain] = useState(0)
-  const [linkBar, setLinkBar] = useState(0)
-  const [numberLink, setNumberLink] = useState(0)
-  const [cement, setCement] = useState(0)
-  const [sand, setSand] = useState(0)
-  const [granite, setGranite] = useState(0)
+function Col_BeamDetails() {
+  const [length, setLength] = useState("");
+  const [breadth, setBreadth] = useState("");
+  const [depth, setDepth] = useState("");
+  const [mainBar, setMainBar] = useState(0);
+  const [mainBarNo, setMainBarNo] = useState("");
+  const [link, setLink] = useState(0);
+  const [linkNo, setLinkNo] = useState("");
+  const [cement, setCement] = useState("");
+  const [sand, setSand] = useState("");
+  const [granite, setGranite] = useState("");
+  const [sandDensity, setSandDensity] = useState(1600);
+  const [graniteDensity, setGraniteDensity] = useState(1800);
+  const [calculate, setCalculate] = useState(false);
 
-  const handleCalculate = () => {}
+  const results = useMemo(() => {
+    if (!length || !breadth || !depth || !cement || !sand || !granite) {
+      return null;
+    }
 
-  return(
+    const voulume = length * breadth * depth;
+    const totalRatio = cement + sand + granite;
+
+    return {
+      cementAmount: (cement / totalRatio) * 28.8 * voulume,
+      sandAmount: (((sand / totalRatio) * sandDensity) / 1000) * voulume,
+      graniteAmount:
+        (((granite / totalRatio) * graniteDensity) / 1000) * voulume,
+    };
+  }, [length, breadth, , depth, cement, sand, granite]);
+
+  const dimensionsInput = [
+    {
+      label: "Length",
+      value: length,
+      onChange: setLength,
+    },
+    {
+      label: "Breadth",
+      value: breadth,
+      onChange: setBreadth,
+    },
+    {
+      label: "Depth",
+      value: depth,
+      onChange: setDepth,
+    },
+  ];
+
+  const reinforcementInput = [
+    {
+      mainbar: [
+        {
+          label: "main10",
+          value: 10,
+          existingValue: mainBar,
+        },
+        {
+          label: "main12",
+          value: 12,
+          existingValue: mainBar,
+        },
+        {
+          label: "main16",
+          value: 16,
+          existingValue: mainBar,
+        },
+        {
+          label: "main20",
+          value: 20,
+          existingValue: mainBar,
+        },
+        {
+          label: "main25",
+          value: 25,
+          existingValue: mainBar,
+        },
+        {
+          label: "main32",
+          value: 32,
+          existingValue: mainBar,
+        },
+      ],
+      link: [
+        {
+          label: "link6",
+          value: 6,
+          existingValue: link,
+        },
+        {
+          label: "link8",
+          value: 8,
+          existingValue: link,
+        },
+      ],
+    },
+  ];
+
+  const materialsInput = [
+    {
+      label: "Cement",
+      value: cement,
+      onChange: setCement,
+    },
+    {
+      label: "Sand",
+      value: sand,
+      onChange: setSand,
+    },
+    {
+      label: "Granite",
+      value: granite,
+      onChange: setGranite,
+    },
+  ];
+
+  return (
     <div className="m-5 mt-10 mx-auto bg-gray-100 p-10 max-w-7xl">
       <h2 className="text-2xl font-bold pb-8 text-center">Columns and Beams</h2>
       <div className="flex flex-wrap justify-around gap-3">
+        {/* Input section for dimensions */}
+
         <div className=" bg-gray-200 w-90 p-5">
           <h2 className="text-xl font-bold">Dimensions</h2>
 
-          <div className="p-2">
-            <label for="length">Length: </label>
-            <input id="length" type="number" value={length} onChange={(e) => setLength(e.target.value)} min={0} max={999} className="border" />
-          </div>
-          
-
-          <div className="p-2">
-            <label for="breadth">Breadth: </label>
-            <input id="breadth" type="number" value={breadth} onChange={(e) => setBreadth(e.target.value)} min={0} max={999} className="border"/>
-          </div>
-
-
-          <div className="p-2">
-            <label for="depth">Depth: </label>
-            <input id="depth" type="number" value={depth} onChange={(e) => setDepth(e.target.value)} min={0} max={999} className="border"/>
-          </div>
+          {dimensionsInput.map((input) => (
+            <DimensionsInput
+              key={input.label}
+              label={input.label}
+              value={input.value}
+              onChange={input.onChange}
+            />
+          ))}
 
           <p className="mt-5">ℹ️ Unit is in meters</p>
-          
         </div>
 
         <div className="flex-col bg-gray-200 w-90 p-5">
@@ -47,83 +145,164 @@ function Col_BeamDetails(){
           <div className="p-2">
             <p className="text-left">Main Bar:</p>
             <div className="flex flex-wrap">
-              <label for='10' className="pr-2">
-                <input id='10' type="radio" name="main" value={10} checked={mainBar === 10} onChange={() => setMainBar(10)} />
-              10mm </label>
-
-              <label for='12' className="pr-2">
-              <input id="12" type="radio" name="main" value={12} checked={mainBar === 12} onChange={() => setMainBar(12)} />
-              12mm </label>
-
-              <label for='16' className="pr-2">
-              <input id="16" type="radio" name="main" value={16} checked={mainBar === 16} onChange={() => setMainBar(16)} />
-              16mm </label>
-
-              <label for='20' className="pr-2">
-              <input id="20" type="radio" name="main" value={20} checked={mainBar === 20} onChange={() => setMainBar(20)} />
-              20mm </label>
-
-              <label for='25' className="pr-2">
-              <input id="25" type="radio" name="main" value={25} checked={mainBar === 25} onChange={() => setMainBar(25)} />
-              25mm </label>
-
-              <label for="32" className="pr-2">
-              <input id="32" type="radio" name="main" value={32} checked={mainBar === 32} onChange={() => setMainBar(32)} />
-              32mm </label>
+              {reinforcementInput[0].mainbar.map((input) => (
+                <BarSizeInput
+                  key={input.label}
+                  label={input.label}
+                  name="main"
+                  value={input.value}
+                  checked={mainBar === input.value}
+                  onChange={setMainBar}
+                />
+              ))}
             </div>
           </div>
 
+          {/* Input section for reinforcements */}
+
           <div className="p-2">
-            <label for='numberMain'>No of main bar: </label>
-            <input id="numberMain" type="number" value={numberMain} onChange={(e) => setNumberMain(e.target.value)} min={0} max={30} className="border" />
+            <label for="numberMain">No of main bar: </label>
+            <input
+              id="numberMain"
+              type="number"
+              value={mainBarNo}
+              onChange={(e) =>
+                setMainBarNo(
+                  e.target.value === "" ? "" : parseInt(e.target.value)
+                )
+              }
+              min={0}
+              max={30}
+              className="border w-24"
+            />
           </div>
 
+          <hr />
 
           <div className="p-2">
             <p className="inline">Link: </p>
-            <div className="flex flex-wrap">
-              <label for="6">
-              <input id="6" type="radio" name="link" value={6} checked={linkBar === 6} onChange={() => setLinkBar(6)} />
-              6mm </label>
+            <div className="flex flex-wrap"></div>
 
-              <label for="8">
-              <input id="8" type="radio" name="link" value={8} checked={linkBar === 8} onChange={() => setLinkBar(8)} />
-              8mm </label>
-            </div>
+            {reinforcementInput[0].link.map((input) => (
+              <BarSizeInput
+                key={input.label}
+                label={input.label}
+                name="dist"
+                value={input.value}
+                checked={link === input.value}
+                onChange={setLink}
+              />
+            ))}
           </div>
 
           <div className="p-2">
-            <label for='numberLink'>No of Links:</label>
-            <input id="numberLink" type="number" value={numberLink} onChange={(e) => setNumberLink(e.target.value)} min={0} max={30} className="border"/>
+            <label for="numberLink">No of Links:</label>
+            <input
+              id="numberLink"
+              type="number"
+              value={linkNo}
+              onChange={(e) =>
+                setLinkNo(e.target.value === "" ? "" : parseInt(e.target.value))
+              }
+              min={0}
+              max={30}
+              className="border w-24"
+            />
           </div>
-
+          <p className="pt-5">ℹ️ Spacing is in Millimeters</p>
         </div>
+
+        {/* Input section for materials */}
 
         <div className="flex-col bg-gray-200 w-90 p-5">
           <h2 className="text-xl font-bold">Materials</h2>
           <p className="text-left p-2">Mix ratio: </p>
 
-          <div className="p-2">
-          <label for='cement'>Cement: </label>
-          <input id="cement" type="number" value={cement} onChange={(e) => setCement(e.target.value)} min={0} max={30} className="border" /> 
+          {materialsInput.map((input) => (
+            <MaterialsInput
+              key={input.label}
+              label={input.label}
+              value={input.value}
+              onChange={input.onChange}
+            />
+          ))}
+
+          <hr />
+
+          <div className="py-2">
+            <label for="sandDensity" className="text-left p-2">
+              Sand Density(kg/m³):{" "}
+            </label>
+            <input
+              id="sandDensity"
+              type="number"
+              step="any"
+              value={sandDensity}
+              onChange={(e) => {
+                setSandDensity(
+                  e.target.value === "" ? "" : parseFloat(e.target.value)
+                );
+              }}
+              min={0}
+              max={9999}
+              className="border w-24"
+            />
           </div>
 
-          <div className="p-2">
-          <label for='sand'>Sand: </label>
-          <input id="sand" type="number" value={sand} onChange={(e) => setSand(e.target.value)} min={0} max={30} className="border" />
+          <div className="py-2">
+            <label for="graniteDensity" className="text-left p-2">
+              Granite Density(kg/m³):{" "}
+            </label>
+            <input
+              id="graniteDensity"
+              type="number"
+              step="any"
+              value={graniteDensity}
+              onChange={(e) => {
+                setGraniteDensity(
+                  e.target.value === "" ? "" : parseFloat(e.target.value)
+                );
+              }}
+              min={0}
+              max={9999}
+              className="border w-24"
+            />
           </div>
 
-          <div className="p-2">
-          <label for="granite">Granite: </label>
-          <input id="granite" type="number" value={granite} onChange={(e) => setGranite(e.target.value)} min={0} max={30} className="border" />
-          </div>
-
+          <p className="mt-5">ℹ️ Ratio is in volume and not weight</p>
         </div>
       </div>
 
-      <button onClick={handleCalculate} className="block m-15 p-4 bg-mist-400 rounded-lg mx-auto text-xl">Calculate</button>
+      <button
+        onClick={() => setCalculate(true)}
+        className="block m-15 p-4 bg-mist-400 rounded-lg mx-auto text-xl"
+      >
+        Calculate
+      </button>
+
+      <div>
+        {calculate ? (
+          results ? (
+            <div className="mt-5 p-5 bg-gray-200 w-90 mx-auto">
+              <h2 className="text-xl font-bold text-center pb-3">Results</h2>
+              <p className="">Cement: {results.cementAmount.toFixed(2)} bags</p>
+              <p>Sand: {results.sandAmount.toFixed(2)} tons</p>
+              <p>Granite: {results.graniteAmount.toFixed(2)} tons</p>
+            </div>
+          ) : (
+            <div className="mt-5 p-5 bg-red-400 w-90 mx-auto rounded-md">
+              <h2 className="text-xl font-bold text-center pb-3">Results</h2>
+              <p className="">
+                Please fill in all the fields to get the results.
+              </p>
+            </div>
+          )
+        ) : (
+          <div></div>
+        )}
+      </div>
     </div>
-  )
+  );
 }
 
-export default Col_BeamDetails
+export default Col_BeamDetails;
